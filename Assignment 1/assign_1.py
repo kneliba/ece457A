@@ -1,4 +1,3 @@
-import random
 
 # This is a 2D list in Python.
 #  Note that the first row in the 2D list is the y = 0 row (i.e. bottom-most row in the maze figure).
@@ -6,6 +5,9 @@ import random
 # '0' indicates that it is free.
 
 # starting point = maze[11][2] or maze[y][x]
+
+
+import random
 
 maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -57,9 +59,17 @@ maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]]
 
 
+def not_repeating_path(path, target_position):
+    if len(path) > 2:
+        if (path[-1] == target_position):
+            return False
+        else:
+            return True
+    return True
+
+
 def random_path(graph, start, end):
     path = []
-    moves = []
     position = [start[0], start[1]]
 
     while (position != end and len(path) < 10000):
@@ -67,28 +77,25 @@ def random_path(graph, start, end):
         x = position[1]
 
         move = random.choice(['l', 'r', 'u', 'd'])
-        moves.append('s')
 
         if move == 'l':
-            if x - 1 > 0 and maze[y][x-1] == 0 and moves[-1] != 'r':
+            if x - 1 >= 0 and maze[y][x-1] == 0 and not_repeating_path(path, [y, x-1]):
                 path.append(position)
                 position = [y, x - 1]
-                moves.append(move)
         if move == 'r':
-            if x + 1 < 24 and maze[y][x+1] == 0 and moves[-1] != 'l':
+            if x + 1 < 25 and maze[y][x+1] == 0 and not_repeating_path(path, [y, x+1]):
                 path.append(position)
                 position = [y, x + 1]
-                moves.append(move)
         if move == 'u':
-            if y + 1 < 24 and maze[y+1][x] == 0 and moves[-1] != 'd':
+            if y + 1 < 25 and maze[y+1][x] == 0 and not_repeating_path(path, [y+1, x]):
                 path.append(position)
                 position = [y + 1, x]
-                moves.append(move)
         if move == 'd':
-            if y - 1 > 0 and maze[y-1][x] == 0 and moves[-1] != 'u':
+            if y - 1 >= 0 and maze[y-1][x] == 0 and not_repeating_path(path, [y-1, x]):
                 path.append(position)
                 position = [y - 1, x]
-                moves.append(move)
+
+        print(path)
 
     return path
 
