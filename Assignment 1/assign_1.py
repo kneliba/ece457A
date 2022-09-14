@@ -5,7 +5,7 @@ import random
 # '1' indicates that the node is blocked,
 # '0' indicates that it is free.
 
-# starting point = [11][2]
+# starting point = maze[11][2] or maze[y][x]
 
 maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -58,6 +58,43 @@ maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 
 def random_path(graph, start, end):
-    print(graph[11][2])
+    path = []
+    moves = []
+    position = [start[0], start[1]]
 
-    move = random.choice('l', 'r', 'u', 'd')
+    while (position != end and len(path) < 10000):
+        y = position[0]
+        x = position[1]
+
+        move = random.choice(['l', 'r', 'u', 'd'])
+        moves.append('s')
+
+        if move == 'l':
+            if x - 1 > 0 and maze[y][x-1] == 0 and moves[-1] != 'r':
+                path.append(position)
+                position = [y, x - 1]
+                moves.append(move)
+        if move == 'r':
+            if x + 1 < 24 and maze[y][x+1] == 0 and moves[-1] != 'l':
+                path.append(position)
+                position = [y, x + 1]
+                moves.append(move)
+        if move == 'u':
+            if y + 1 < 24 and maze[y+1][x] == 0 and moves[-1] != 'd':
+                path.append(position)
+                position = [y + 1, x]
+                moves.append(move)
+        if move == 'd':
+            if y - 1 > 0 and maze[y-1][x] == 0 and moves[-1] != 'u':
+                path.append(position)
+                position = [y - 1, x]
+                moves.append(move)
+
+    return path
+
+
+start = [11, 2]
+end = [19, 23]
+final_path = random_path(maze, start, end)
+print(final_path)
+print(len(final_path))
