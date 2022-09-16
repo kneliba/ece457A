@@ -6,7 +6,6 @@
 
 # starting point = maze[11][2] or maze[y][x]
 
-
 import random
 
 maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -60,7 +59,7 @@ maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 
 def not_repeating_path(path, target_position):
-    if len(path) > 2:
+    if len(path) > 1:
         if (path[-1] == target_position):
             return False
         else:
@@ -68,11 +67,12 @@ def not_repeating_path(path, target_position):
     return True
 
 
-def random_path(graph, start, end):
+def random_path(maze, start, end1, end2):
     path = []
     position = [start[0], start[1]]
+    limit = 100000
 
-    while (position != end and len(path) < 10000):
+    while (position != end1 and position != end2 and len(path) < limit):
         y = position[0]
         x = position[1]
 
@@ -95,13 +95,17 @@ def random_path(graph, start, end):
                 path.append(position)
                 position = [y - 1, x]
 
-        print(path)
+        print(len(path))
+
+    if (len(path) < limit):
+        path.append(position)
 
     return path
 
 
 start = [11, 2]
-end = [19, 23]
-final_path = random_path(maze, start, end)
+end1 = [19, 23]
+end2 = [21, 2]
+final_path = random_path(maze, start, end1, end2)
 print(final_path)
 print(len(final_path))
