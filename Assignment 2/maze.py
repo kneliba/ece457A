@@ -1,3 +1,4 @@
+from copy import deepcopy
 
 maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -49,6 +50,48 @@ maze = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         [0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0]]
 
 
+def print_path(path, start, end2, end1):
+    maze_copy = deepcopy(maze)
+
+    for point in path:
+        y = point[0]
+        x = point[1]
+        maze_copy[y][x] = 2
+
+    maze_copy[start[0]][start[1]] = 'S'
+    maze_copy[end1[0]][end1[1]] = 'E'
+    maze_copy[end2[0]][end2[1]] = 'E'
+
+    all_rows = []
+    oriented_maze = deepcopy(maze_copy[::-1])
+
+    for row in oriented_maze:
+        current_row = []
+
+        for value in row:
+            if value == 1:
+                current_row.append(chr(0x25A0))
+
+            elif value == 0:
+                current_row.append('.')
+
+            elif value == 2:
+                current_row.append('*')
+
+            else:
+                current_row.append(value)
+
+        all_rows.append(' '.join(current_row))
+
+    print('\n'.join(all_rows))
+
+
+def print_info(final_goal, final_path, cost):
+    print(f"Goal found: {final_goal}")
+    print(f"Path cost: {len(final_path)}")
+    print(f"Nodes explored: {cost} \n")
+
+
 def backtrace(parent, start, end):
     path = [end]
     while path[-1] != start:
@@ -58,28 +101,6 @@ def backtrace(parent, start, end):
     return path
 
 
-def print_maze(given_maze, path, start, end1, end2):
-
-    lines = []
-    reverse = given_maze[::1]
-    # https://python-tcod.readthedocs.io/en/latest/tcod/charmap-reference.html
-    whiteSquare = chr(0x2591)
-    blackSquare = chr(0x25A0)
-    smileFace = chr(0x263B)
-    for row in reverse:
-        line = []
-        for x in row:
-            if x == 1:
-                stuff = blackSquare
-            elif x == 0:
-                stuff = whiteSquare
-            # elif x == 2:
-            #     stuff = smileFace
-            line.append(stuff)
-        lines.append(' '.join(line))
-    print('\n'.join(lines))
-
-
 def search_maze(search_type, start, end1, end2, order):
     fringe = []
     position = [start[0], start[1]]
@@ -87,7 +108,7 @@ def search_maze(search_type, start, end1, end2, order):
         order.reverse()
 
     expanded = []
-    parent = maze
+    parent = deepcopy(maze)
 
     while (position != end1 and position != end2):
         if (len(fringe) > 0):
@@ -125,7 +146,9 @@ def search_maze(search_type, start, end1, end2, order):
                     parent[y-1][x] = [y, x]
 
     goalfound = expanded[-1]
-    return backtrace(parent, start, goalfound)
+    final_path = backtrace(parent, start, goalfound)
+    print_path(final_path, start, end1, end2)
+    print_info(goalfound, final_path, len(expanded))
 
 
 start = [11, 2]
@@ -135,5 +158,11 @@ end2 = [21, 2]
 order1 = ['l', 'u', 'r', 'd']
 order2 = ['r', 'u', 'l', 'd']
 
-final_path = search_maze("breadth", start, end1, end2, order2)
-print_maze(maze, final_path, start, end1, end2)
+print("BFS Order(1)")
+search_maze("breadth", start, end1, end2, order1)
+print("BFS Order(2)")
+search_maze("breadth", start, end1, end2, order2)
+print("DFS Order(1)")
+search_maze("depth", start, end1, end2, order1)
+print("DFS Order(2)")
+search_maze("depth", start, end1, end2, order2)
