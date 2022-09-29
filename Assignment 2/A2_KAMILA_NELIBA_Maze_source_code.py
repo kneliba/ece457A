@@ -126,22 +126,22 @@ def search_maze(search_type, start, end1, end2, order):
 
         for move in order:
             if move == 'l':
-                if x - 1 >= 0 and maze[y][x-1] == 0 and [y, x-1] not in fringe and [y, x-1] not in expanded:
+                if x - 1 >= 0 and maze[y][x-1] == 0 and [y, x-1] not in expanded:
                     fringe.append([y, x-1])
                     parent[y][x-1] = [y, x]
 
             if move == 'u':
-                if y + 1 < 25 and maze[y+1][x] == 0 and [y+1, x] not in fringe and [y+1, x] not in expanded:
+                if y + 1 < 25 and maze[y+1][x] == 0 and [y+1, x] not in expanded:
                     fringe.append([y+1, x])
                     parent[y+1][x] = [y, x]
 
             if move == 'r':
-                if x + 1 < 25 and maze[y][x+1] == 0 and [y, x+1] not in fringe and [y, x+1] not in expanded:
+                if x + 1 < 25 and maze[y][x+1] == 0 and [y, x+1] not in expanded:
                     fringe.append([y, x+1])
                     parent[y][x+1] = [y, x]
 
             if move == 'd':
-                if y - 1 >= 0 and maze[y-1][x] == 0 and [y-1, x] not in fringe and [y-1, x] not in expanded:
+                if y - 1 >= 0 and maze[y-1][x] == 0 and [y-1, x] not in expanded:
                     fringe.append([y-1, x])
                     parent[y-1][x] = [y, x]
 
