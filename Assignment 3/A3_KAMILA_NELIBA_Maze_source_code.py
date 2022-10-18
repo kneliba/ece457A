@@ -138,11 +138,11 @@ def search_maze(start, end1, end2):
 
         expanded.append([y, x])
 
-        if x - 1 >= 0 and maze[y][x-1] == 0 and [y, x-1] not in expanded:
-            man_dist = get_manhattan_distance([y, x-1], end1, end2)
-            fringe.append([y, x-1, position[2]+1, man_dist,
+        if x + 1 < 25 and maze[y][x+1] == 0 and [y, x+1] not in expanded:
+            man_dist = get_manhattan_distance([y, x+1], end1, end2)
+            fringe.append([y, x+1, position[2]+1, man_dist,
                           position[2]+1 + man_dist])
-            parent[y][x-1] = [y, x]
+            parent[y][x+1] = [y, x]
 
         if y + 1 < 25 and maze[y+1][x] == 0 and [y+1, x] not in expanded:
             man_dist = get_manhattan_distance([y+1, x], end1, end2)
@@ -150,11 +150,11 @@ def search_maze(start, end1, end2):
                           position[2]+1 + man_dist])
             parent[y+1][x] = [y, x]
 
-        if x + 1 < 25 and maze[y][x+1] == 0 and [y, x+1] not in expanded:
-            man_dist = get_manhattan_distance([y, x+1], end1, end2)
-            fringe.append([y, x+1, position[2]+1, man_dist,
+        if x - 1 >= 0 and maze[y][x-1] == 0 and [y, x-1] not in expanded:
+            man_dist = get_manhattan_distance([y, x-1], end1, end2)
+            fringe.append([y, x-1, position[2]+1, man_dist,
                           position[2]+1 + man_dist])
-            parent[y][x+1] = [y, x]
+            parent[y][x-1] = [y, x]
 
         if y - 1 >= 0 and maze[y-1][x] == 0 and [y-1, x] not in expanded:
             man_dist = get_manhattan_distance([y-1, x], end1, end2)
