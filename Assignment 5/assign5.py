@@ -1,4 +1,5 @@
 from copy import deepcopy
+import random
 
 flow = [[0, 0, 5, 0, 5, 2, 10, 3, 1, 5, 5, 5, 0, 0, 5, 4, 4, 0, 0, 1],
         [0, 0, 3, 10, 5, 1, 5, 1, 2, 4, 2, 5, 0, 10, 10, 3, 0, 5, 10, 5],
@@ -51,71 +52,127 @@ def evaluate(solution):
     return cost
 
 
-def find_all_neighbours(solution):
-    neighbours = []
-    for i in range(len(solution)):
-        j = i+1
-        for j in range(len(solution)):
-            if i < j:
-                copy = deepcopy(solution)
-                copy[i], copy[j] = copy[j], copy[i]
-                cost = evaluate(copy)
-                neighbours.append([copy, cost, [copy[i], copy[j]]])
+def neighbourhood_search(solution, tabu_num, tabu_list, aspiration, all_time_best_cost, half, frequency):
+    best_solution = []
+    best_cost = 100000
+    frequency_cost = 0
 
-    return neighbours
+    if (aspiration == False):
+        all_time_best_cost = 0
+
+    best_i = -1
+    best_j = -1
+
+    for i in range(0, len(solution)-1):
+        for j in range(i+1, len(solution)):
+            if half == True:
+                if random.choice([0, 1]) == 1:
+                    continue
+
+            copy = deepcopy(solution)
+            copy[i], copy[j] = copy[j], copy[i]
+
+            if (frequency == True):
+                frequency_cost = tabu_list[best_j][best_i]
+            cost = evaluate(copy) + frequency_cost * 2
+
+            if (tabu_list[i][j] == 0 or cost < all_time_best_cost) and len(best_solution) == 0:
+                best_solution = deepcopy(copy)
+                best_cost = cost
+                best_i = i
+                best_j = j
+
+            if (tabu_list[i][j] == 0 or cost < all_time_best_cost) and cost < best_cost:
+                best_solution = deepcopy(copy)
+                best_cost = cost
+                best_i = i
+                best_j = j
+
+    tabu_list[best_i][best_j] = tabu_num
+    if (frequency == True):
+        tabu_list[best_j][best_i] += 1
+
+    return best_solution, tabu_list, best_cost
 
 
 def decremented_tabu(tabu_list):
-    for i in range(len(tabu_list)):
-        if tabu_list[i][1] == 1:
-            tabu_list.pop(i)
-            continue
+    tabu = deepcopy(tabu_list)
+    for i in range(0, 19):
+        for j in range(i+1, 20):
+            if (tabu[i][j] != 0):
+                tabu[i][j] -= 1
 
-        tabu_list[i][1] = tabu_list[i][1] - 1
-
-    return tabu_list
-
-
-def in_tabu(pos, tabu_list):
-    for i in range(len(tabu_list)):
-        if pos == tabu_list[i][0]:
-            return True
-    return False
+    return tabu
 
 
-def tabu_search():
-    tabu_num = 14
-    departments = list(range(1, 21))
+def tabu_search(start_point, tabu_num, half_neighours, frequency, aspiration):
+    departments = start_point
 
-    tabu_list = []
+    tabu_list = [[0]*20 for i in range(20)]
 
-    i = 200
-    while i > 0:
-        print(i)
+    best_departments = deepcopy(departments)
+    cost = evaluate(best_departments)
+    best_cost = cost
+    best_iteration = 0
+
+    i = 0
+    while i < 3000:
+        # print(f"i:{i} {departments} {cost} Best cost: {best_cost}")
+
+        [departments, tabu_list, cost] = neighbourhood_search(
+            departments, tabu_num, tabu_list, aspiration, best_cost, half_neighours, frequency)
+
         tabu_list = deepcopy(decremented_tabu(tabu_list))
 
-        neighbours = find_all_neighbours(departments)
-        neighbours.sort(key=lambda col: col[1])
+        if cost < best_cost:
+            best_cost = cost
+            best_departments = deepcopy(departments)
+            best_iteration = i
 
-        print(neighbours)
-        print(tabu_list)
+        i += 1
 
-        j = 0
-        if in_tabu(neighbours[0][2], tabu_list) == False:
-            tabu_list.append([neighbours[0][2], tabu_num])
-        else:
-            not_in_tabu = False
-
-            while not_in_tabu == False:
-                if in_tabu(neighbours[j][2], tabu_list) == False:
-                    not_in_tabu = True
-                j += 1
-
-        departments = deepcopy(neighbours[j][0])
-        i -= 1
-
-    print(departments)
-    print(evaluate(departments))
+    print(
+        f"order: {best_departments}, cost: {evaluate(best_departments)}, num_i: {best_iteration} \n")
 
 
-tabu_search()
+half_neighours = False
+frequency = False
+aspiration = False
+tabu_num = 14
+
+departments = list(range(1, 21))  # incrementing
+
+departments1 = [20, 19, 18, 17, 16, 15, 14,
+                13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1]  # decrementing
+departments2 = [20, 1, 19, 2, 18, 3, 17, 4,
+                16, 5, 15, 6, 14, 7, 13, 8, 12, 9, 11, 10]  # oscillating
+
+print("default + tabu: 13")
+tabu_search(departments, tabu_num=13, half_neighours=False,
+            frequency=False, aspiration=False)
+
+print("default + decrease tabu: 10")
+tabu_search(departments, tabu_num=10, half_neighours=False,
+            frequency=False, aspiration=False)
+
+print("default + increase tabu: 16")
+tabu_search(departments, tabu_num=16, half_neighours=False,
+            frequency=False, aspiration=False)
+
+print("change departments:")
+tabu_search(departments1, tabu_num=13, half_neighours=False,
+            frequency=False, aspiration=False)
+
+print("change departments:")
+tabu_search(departments2, tabu_num=13, half_neighours=False,
+            frequency=False, aspiration=False)
+
+print("aspiration:")
+tabu_search(departments, tabu_num=13, half_neighours=False,
+            frequency=False, aspiration=True)
+print("aspiration + half neighbours:")
+tabu_search(departments, tabu_num=13, half_neighours=True,
+            frequency=False, aspiration=True)
+print("aspiration + frequency:")
+tabu_search(departments, tabu_num=13, half_neighours=False,
+            frequency=True, aspiration=True)
