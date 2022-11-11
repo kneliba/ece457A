@@ -3,6 +3,7 @@ from numpy.random import randint
 from numpy.random import rand
 import matplotlib.pyplot as plt
 import numpy as np
+import graycode
 
 
 def get_x_y(chromosome):
@@ -10,10 +11,42 @@ def get_x_y(chromosome):
 
     gc_x, gc_y = chromosome[:mid_point], chromosome[mid_point:]
 
-    x, y = sum(val*(2**idx) for idx, val in enumerate(reversed(gc_x))
+    print(gc_x)
+    gc_x = "11110010100001"
+
+    print(gc_x.split())
+    gc_x = [eval(s) for s in list(gc_x)]
+    print(gc_x)
+
+    print(binary_from_gc(gc_x))
+
+    x, y = sum(val*(2**idx) for idx, val in enumerate(reversed(list(gc_x)))
                ), sum(val*(2**idx) for idx, val in enumerate(reversed(gc_y)))
 
+    # grey_code = [1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1]
+
+    # x, y = get_decimal_from_gc(gc_x), get_decimal_from_gc(gc_y)
+
+    print(x)
+    print((x-5000)/1000)
+
     return (x-5000)/1000, (y-5000)/1000
+
+
+def flip(bit):
+    return '1' if (bit == '0') else '0'
+
+
+def binary_from_gc(greycode):
+    binary = ""
+    binary += str(greycode[0])
+
+    for i in range(1, len(greycode)):
+        if (greycode[i] == 0):
+            binary += binary[i-1]
+        else:
+            binary += flip(binary[i-1])
+    return binary
 
 
 def get_decimal_from_gc(greycode):
@@ -25,10 +58,10 @@ def get_decimal_from_gc(greycode):
             binary[len(greycode) - 1] = greycode[len(greycode) - 1]
         else:
             binary[len(greycode) - 1 - i] = binary[len(greycode) -
-                                                   1] ^ int(greycode[len(greycode) - 1 - i])
+                                                   i] ** int(greycode[len(greycode) - 1 - i])
 
     for i in range(len(greycode)):
-        decimal = decimal + (2**i) * binary[i]
+        decimal += (2**i) * binary[i]
     return decimal
 
 
@@ -106,7 +139,7 @@ def simple_ga(n_bits, n_iter, n_pop):
 
 n_bits = 28
 n_pop = 140
-n_iter = 140
+n_iter = 1
 
 Pc = 0.9
 Pm = 0.05
