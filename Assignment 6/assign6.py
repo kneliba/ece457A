@@ -11,24 +11,11 @@ def get_x_y(chromosome):
 
     gc_x, gc_y = chromosome[:mid_point], chromosome[mid_point:]
 
-    print(gc_x)
-    gc_x = "11110010100001"
+    bin_x = binary_from_gc(gc_x)
+    bin_y = binary_from_gc(gc_y)
 
-    print(gc_x.split())
-    gc_x = [eval(s) for s in list(gc_x)]
-    print(gc_x)
-
-    print(binary_from_gc(gc_x))
-
-    x, y = sum(val*(2**idx) for idx, val in enumerate(reversed(list(gc_x)))
-               ), sum(val*(2**idx) for idx, val in enumerate(reversed(gc_y)))
-
-    # grey_code = [1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 1]
-
-    # x, y = get_decimal_from_gc(gc_x), get_decimal_from_gc(gc_y)
-
-    print(x)
-    print((x-5000)/1000)
+    x, y = sum(val*(2**idx) for idx, val in enumerate(reversed(list(bin_x)))
+               ), sum(val*(2**idx) for idx, val in enumerate(reversed(bin_y)))
 
     return (x-5000)/1000, (y-5000)/1000
 
@@ -46,23 +33,9 @@ def binary_from_gc(greycode):
             binary += binary[i-1]
         else:
             binary += flip(binary[i-1])
-    return binary
 
-
-def get_decimal_from_gc(greycode):
-    binary = np.zeros(len(greycode), dtype=int)
-    decimal = 0
-
-    for i in range(len(greycode)):
-        if i == 0:
-            binary[len(greycode) - 1] = greycode[len(greycode) - 1]
-        else:
-            binary[len(greycode) - 1 - i] = binary[len(greycode) -
-                                                   i] ** int(greycode[len(greycode) - 1 - i])
-
-    for i in range(len(greycode)):
-        decimal += (2**i) * binary[i]
-    return decimal
+    binary_form = [eval(s) for s in list(binary)]
+    return binary_form
 
 
 def evaluate(x, y):
@@ -115,7 +88,7 @@ def simple_ga(n_bits, n_iter, n_pop):
     best_per_iter = []
 
     j = 0
-    for gen in range(n_iter+1):
+    for generation in range(n_iter):
         fitness = [evaluate(*get_x_y(gene)) for gene in pop]
         current_avg = sum(fitness)/len(fitness)
         avg_fitness.append(current_avg)
@@ -126,7 +99,10 @@ def simple_ga(n_bits, n_iter, n_pop):
 
         best_per_iter.append(best_eval)
 
-        print(f"i:{j} Best: {best_eval}, Average:{current_avg}")
+        best_x, best_y = get_x_y(best_chrome)
+
+        print(
+            f"i:{j} Best: {best_eval}, x:{best_x}, y:{best_y} Average:{current_avg}")
 
         parents = [get_parents(pop, fitness, 3)
                    for gene in range(len(pop))]
@@ -139,13 +115,10 @@ def simple_ga(n_bits, n_iter, n_pop):
 
 n_bits = 28
 n_pop = 140
-n_iter = 1
-
-Pc = 0.9
-Pm = 0.05
+n_iter = 140
 
 best_chrome, best_eval, avg_fit, best_iter = simple_ga(n_bits, n_pop, n_iter)
-print(best_eval)
+print(f"final solution: {best_eval}")
 x, y = get_x_y(best_chrome)
 print(f"x: {x}, y: {y}")
 
